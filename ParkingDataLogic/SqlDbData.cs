@@ -11,15 +11,26 @@ namespace ParkingManagementData
     public class SqlDbData
     {
         static string connectionString
-       // = "Data Source =MHACEE\\SQLEXPRESS; Initial Catalog = ParkingManagement; Integrated Security = True;";
-       = "Server=tcp:20.195.15.75,1433;Database=ParkingManagement;User Id=sa;Password=Kurtjerome11";
+        = "Data Source =VIBUYBOOK\\SQLEXPRESS; Initial Catalog = ParkingManagement; Integrated Security = True;";
+       // = "Server=tcp:20.195.15.75,1433;Database=ParkingManagement;User Id=sa;Password=Kurtjerome11";
         static SqlConnection sqlConnection = new SqlConnection(connectionString);
-
+        
         static public void Connect()
         {
             sqlConnection.Open();
         }
+        public static bool PlateNumberExists(string plateNum)
+        {
+            string selectStatement = "SELECT COUNT(*) FROM users WHERE plateNum = @plateNum";
+            SqlCommand selectCommand = new SqlCommand(selectStatement, sqlConnection);
+            selectCommand.Parameters.AddWithValue("@plateNum", plateNum);
 
+            sqlConnection.Open();
+            int count = (int)selectCommand.ExecuteScalar();
+            sqlConnection.Close();
+
+            return count > 0;
+        }
         public static List<Park> GetParked()
         {
             string selectStatement = "SELECT plateNum, colorCar FROM users";
@@ -68,32 +79,34 @@ namespace ParkingManagementData
 
         }
 
-        public static void UpdateCar(string plateNum, string colorCar)
+        public static void UpdateCar(string originalPlateNum, string updatedPlateNum, string updatedColorCar)
         {
-            var updateStatment = $"UPDATE users SET colorCar = @colorCar WHERE plateNum = @plateNum";
-            SqlCommand updateCommand = new SqlCommand(updateStatment, sqlConnection);
+            var updateStatement = "UPDATE users SET plateNum = @updatedPlateNum, colorCar = @updatedColorCar WHERE plateNum = @originalPlateNum";
+            SqlCommand updateCommand = new SqlCommand(updateStatement, sqlConnection);
             sqlConnection.Open();
 
-            updateCommand.Parameters.AddWithValue("@colorCar", colorCar);
-            updateCommand.Parameters.AddWithValue("@plateNum", plateNum);
+            updateCommand.Parameters.AddWithValue("@updatedPlateNum", updatedPlateNum);
+            updateCommand.Parameters.AddWithValue("@updatedColorCar", updatedColorCar);
+            updateCommand.Parameters.AddWithValue("@originalPlateNum", originalPlateNum);
 
             updateCommand.ExecuteNonQuery();
 
             sqlConnection.Close();
         }
 
-        public static void DeleteCar(string plateNum)
+
+        public static void DeleteCar(string plateNum, string colorCar)
         {
-            string deleteStatement = $"DELETE FROM users WHERE plateNum = @plateNum";
+            string deleteStatement = "DELETE FROM users WHERE plateNum = @plateNum AND colorCar = @colorCar";
             SqlCommand deleteCommand = new SqlCommand(deleteStatement, sqlConnection);
             sqlConnection.Open();
 
             deleteCommand.Parameters.AddWithValue("@plateNum", plateNum);
+            deleteCommand.Parameters.AddWithValue("@colorCar", colorCar);
 
             deleteCommand.ExecuteNonQuery();
 
             sqlConnection.Close();
-
         }
 
     }

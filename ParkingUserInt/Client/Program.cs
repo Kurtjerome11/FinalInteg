@@ -1,12 +1,17 @@
+using MimeKit;
 using ParkingManagementData;
 using ParkingManagementModels;
+using MailKit.Net.Smtp;
 using System;
+using System.ComponentModel.DataAnnotations;
+using ParkingBL;
+using ParkingManagementServices;
 
 namespace Client
 {
     internal class Program
     {
-        static void Main(string[] args)
+       public static void Main(string[] args)
         {
             bool active = true;
             while (active)
@@ -33,17 +38,32 @@ namespace Client
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
                         string plateNum = Console.ReadLine();
 
+                        if (SqlDbData.PlateNumberExists(plateNum))
+                        {
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Console.WriteLine("The car is already parked.");
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Console.WriteLine("");
+                            Console.WriteLine("");
+                            Console.WriteLine("");
+                        }
+                        else
+                        {
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Console.WriteLine("What is the color of the Car?");
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            string colorCar = Console.ReadLine();
+                            SqlDbData.AddCar(plateNum, colorCar);
 
-                        Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
-                        Console.WriteLine("What is the color of the Car?");
-                        Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
-                        string colorCar = Console.ReadLine();
-                        SqlDbData.AddCar(plateNum, colorCar);
-
-                        Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
-                        Console.WriteLine("Okay Cool! Heres the parking ticket!");
-                        Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
-
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Console.WriteLine("Okay Cool! Here's the parking ticket!");
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Email.AddEmail(plateNum, colorCar);
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Console.WriteLine("");
+                            Console.WriteLine("");
+                            Console.WriteLine("");
+                        }
                     }
 
                     else if (number == "2")
@@ -52,11 +72,32 @@ namespace Client
                         Console.WriteLine("What is the plateNumber?");
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
                         string plateNum = Console.ReadLine();
-                        SqlDbData.DeleteCar(plateNum);
 
-                        Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
-                        Console.WriteLine("Okay Cool! The Data of that Car is Deleted!");
-                        Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                        if (!SqlDbData.PlateNumberExists(plateNum))
+                        {
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Console.WriteLine("The Car is not our parking area anymore.");
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Console.WriteLine("");
+                            Console.WriteLine("");
+                            Console.WriteLine("");
+                        }
+                        else
+                        {
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Console.WriteLine("What is the color of the Car?");
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            string colorCar = Console.ReadLine();
+                            SqlDbData.DeleteCar(plateNum, colorCar);
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Console.WriteLine("Okay Cool! The Data of that Car is Deleted!");
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Email.DeleteEmail(plateNum, colorCar);
+                            Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                            Console.WriteLine("");
+                            Console.WriteLine("");
+                            Console.WriteLine("");
+                        }
                     }
                     else if (number == "3")
                     {
@@ -65,33 +106,46 @@ namespace Client
                         Console.WriteLine("");
                         GetParked();
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                        Email.DisplayEmail();
+                        Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                        Console.WriteLine("");
+                        Console.WriteLine("");
+                        Console.WriteLine("");
+
                     }
                     else if (number == "4")
                     {
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
                         Console.WriteLine("Okay, What is the plateNumber that you want to update?");
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
-                        string plateNum = Console.ReadLine();
+                        string originalplateNum = Console.ReadLine();
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
                         Console.WriteLine("Okay, What is the updated plateNumber?");
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
-                        string parkedNum = Console.ReadLine();
+                        string updatedplateNum = Console.ReadLine();
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
                         Console.WriteLine("How about the updated Color of the car?");
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
-                        string colorCar = Console.ReadLine();
-                        SqlDbData.UpdateCar(parkedNum,colorCar);
+                        string updatedcolorCar = Console.ReadLine();
+                        SqlDbData.UpdateCar(originalplateNum, updatedplateNum, updatedcolorCar);
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
-
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
                         Console.WriteLine("Okay Cool! The Data of that Car is Updated!");
                         Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                        Email.UpdateEmail(originalplateNum, updatedplateNum, updatedcolorCar);
+                        Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
+                        Console.WriteLine("");
+                        Console.WriteLine("");
+                        Console.WriteLine("");
                     }
 
                     else
                 {
                     Console.WriteLine("ERROR");
-                }
+                        Console.WriteLine("");
+                        Console.WriteLine("");
+                        Console.WriteLine("");
+                    }
 
 
             }
@@ -106,9 +160,11 @@ namespace Client
 
             foreach (var item in usersFromDB)
             {
-                Console.WriteLine(item.plateNum);
-                Console.WriteLine(item.colorCar);
+                Console.WriteLine($"PlateNumber: {item.plateNum}");
+                Console.WriteLine($"ColorCar: {item.colorCar}");
+                Console.WriteLine(); 
             }
+
         }
     }
 }
