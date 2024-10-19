@@ -6,7 +6,7 @@ using ParkingManagementServices;
 namespace ParkingAPI.Controllers
 {
     [ApiController]
-    [Route("api/user")]
+    [Route("api/park")]
     public class ParkController : Controller
     {
         ParkBL parkbl;
