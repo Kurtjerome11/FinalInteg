@@ -9,26 +9,24 @@ namespace ParkingAPI.Controllers
     [Route("api/user")]
     public class ParkController : Controller
     {
-        ParkingGServices _userGetServices;
-        ParkBL _userTransactionServices;
+        ParkBL parkbl;
 
         public ParkController()
         {
-            _userGetServices = new ParkingGServices();
-            _userTransactionServices = new ParkBL();
+            parkbl = new ParkBL();
         }
 
         [HttpGet]
         [Route("displayparkedcars")]
-        public IEnumerable<ParkingAPI.User> GetParked()
+        public IEnumerable<User> GetParked()
         {
-            var activeusers = _userGetServices.GetUsersByStatus(1);
+            var activeusers = parkbl.GetParked();
 
-            List<ParkingAPI.User> users = new List<User>();
+            List<User> users = new List<User>();
 
             foreach (var item in activeusers)
             {
-                users.Add(new ParkingAPI.User { plateNum = item.plateNum, colorCar = item.colorCar, status = item.status });
+                users.Add(new User { plateNum = item.plateNum, colorCar = item.colorCar});
             }
 
             return users;
@@ -38,27 +36,27 @@ namespace ParkingAPI.Controllers
         [Route("carsthatwillpark")]
         public JsonResult AddCar(User request)
         {
-            var result = _userTransactionServices.CreateCar(request.plateNum, request.colorCar);
+            parkbl.CreateCar(request.plateNum, request.colorCar);
 
-            return new JsonResult(result);
+            return new JsonResult("Okay Cool! Here's the parking ticket!");
         }
 
         [HttpPatch]
         [Route("carsthatneedstobeupdate")]
-        public JsonResult UpdateCar(User request)
+        public JsonResult UpdateCar(update request)
         {
-            var result = _userTransactionServices.UpdateCar(request.plateNum, request.colorCar);
+            parkbl.UpdateCar(request.oldplatenum, request.updateplatenum, request.updatedcolorCar);
 
-            return new JsonResult(result);
+            return new JsonResult("Okay Cool! The Data of that Car is Updated!");
         }
 
         [HttpDelete]
         [Route("carsthatwillgo")]
         public JsonResult DeleteCar(User request)
         {
-            var result = _userTransactionServices.DeleteCar(request.plateNum, request.colorCar);
+            parkbl.DeleteCar(request.plateNum);
 
-            return new JsonResult(result);
+            return new JsonResult("Okay Cool! The Data of that Car is Deleted!");
         }
 
 

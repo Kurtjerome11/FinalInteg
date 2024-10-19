@@ -95,14 +95,13 @@ namespace ParkingManagementData
         }
 
 
-        public static void DeleteCar(string plateNum, string colorCar)
+        public static void DeleteCar(string plateNum)
         {
-            string deleteStatement = "DELETE FROM users WHERE plateNum = @plateNum AND colorCar = @colorCar";
+            string deleteStatement = "DELETE FROM users WHERE plateNum = @plateNum";
             SqlCommand deleteCommand = new SqlCommand(deleteStatement, sqlConnection);
             sqlConnection.Open();
 
             deleteCommand.Parameters.AddWithValue("@plateNum", plateNum);
-            deleteCommand.Parameters.AddWithValue("@colorCar", colorCar);
 
             deleteCommand.ExecuteNonQuery();
 

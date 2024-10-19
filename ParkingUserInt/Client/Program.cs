@@ -88,7 +88,7 @@ namespace Client
                             Console.WriteLine("What is the color of the Car?");
                             Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
                             string colorCar = Console.ReadLine();
-                            SqlDbData.DeleteCar(plateNum, colorCar);
+                            SqlDbData.DeleteCar(plateNum);
                             Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
                             Console.WriteLine("Okay Cool! The Data of that Car is Deleted!");
                             Console.WriteLine("- - - - - - - - - - - - - - - - - - ");
